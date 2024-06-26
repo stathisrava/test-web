@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>Login Form</title>
+   <link rel="stylesheet" href="index.css">
+   <link rel="preload" href="index.css" as="style">
+   <script src="text_effect_for_index.js" defer></script>
+</head>
+<body>
+   <!-- Adding a header -->
+   <nav>
+      <div class="logo">
+         <p>Des Times</p>
+      </div>
+      <ul>
+         <li><a href="login.html">Sign In</a></li>
+         <li><a href="ABOUT.html">About</a></li> 
+         <li><a href="CONTACT.html">Contact</a></li>
+      </ul>
+   </nav>
+
+   <!-- Adding animated text -->
+   <div id="container">
+      <span id="text1"></span>
+      <span id="text2"></span>
+   </div>
+
+   <svg id="filters">
+      <defs>
+         <filter id="threshold">
+            <feColorMatrix in="SourceGraphic" type="matrix"
+            values="1 0 0 0 0
+                   0 1 0 0 0
+                   0 0 1 0 0
+                   0 0 0 255 -140" />
+         </filter>
+      </defs>
+   </svg>
+
+   <div class="box">
+      <form autocomplete="off" method="post" action="index.php" >
+         <h2>Register Now</h2>
+         <div class="inputBox">
+            <input type="text" required="required" id="username" name="username">
+            <span>Username</span>
+            <i></i>
+         </div>   
+
+         <div class="inputBox">
+            <input type="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+               title="Must contain at least one number and one uppercase and lowercase letter, at least 8 or more characters and at least one special character" required="required" id="password" name="password">
+            <span>Password</span>
+            <i></i>
+         </div>
+
+
+
+         <input type="hidden" name="latitude" id="latitude">
+         <input type="hidden" name="longitude" id="longitude">
+ 
+
+
+         <div class="inputBox">
+            <input type="text" required="required" id="name" name="name">
+            <span>First Name</span>
+            <i></i>
+         </div>
+
+         <div class="inputBox">
+            <input type="text" required="required" id="lastname" name="lastname">
+            <span>Last Name</span>
+            <i></i>
+         </div>
+
+        
+         <div class="inputBox">
+            <input type="tel" required="required" id="phone_num" name="phone_num" 
+            placeholder="69********" pattern="[6][9][0-9]{8}" required>
+            <span>Phone Number</span>
+            <i></i>
+         </div>
+
+
+       
+
+
+         
+
+         <div class="links">
+            <a href="login.html">Already have an account?</a>
+         </div>
+         <input type="submit" value="Sign Up">
+      </form>
+   </div>
+</body>
+</html><!-- Other HTML code above this line -->
+<!-- ... (your HTML code above this line) ... -->
+
+
+<!-- Other HTML code above this line -->
+
+<script>
+   // Function to handle the success case of getting the user's location
+   function success(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      // Set the values of the hidden fields
+   document.getElementById('latitude').value = latitude;
+   document.getElementById('longitude').value = longitude;
+
+
+      // You can use latitude and longitude values as needed
+      console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+   }
+
+   // Function to handle the error case of getting the user's location
+   function error() {
+      console.error("Unable to retrieve your location");
+   }
+// Check if the Geolocation API is supported by the browser
+if (navigator.geolocation) {
+   // Ask the user for permission before retrieving the location
+   const userPermission = confirm("Share your location");
+
+   if (userPermission) {
+      // Request the user's location
+      navigator.geolocation.getCurrentPosition(success, error);
+   } else {
+      console.log("User denied location access");
+   }
+} else {
+   console.error("Geolocation is not supported by your browser");
+}
+</script>
+
+</body>
+</html>

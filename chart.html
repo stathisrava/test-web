@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+</head>
+<body>
+
+<!-- Date Range Picker -->
+<label for="startDate">Start Date:</label>
+<input type="date" id="startDate">
+<label for="endDate">End Date:</label>
+<input type="date" id="endDate">
+<button onclick="updateChart()">Update Chart</button>
+
+<canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+
+<script>
+// Function to get an array of date strings for the current week
+function getDaysOfWeek() {
+  const daysOfWeek = [];
+  const currentDate = new Date();
+  const currentDay = currentDate.getDay();
+  const firstDay = new Date(currentDate);
+  firstDay.setDate(currentDate.getDate() - currentDay);
+  
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(firstDay);
+    day.setDate(firstDay.getDate() + i);
+    daysOfWeek.push(day.toISOString().split('T')[0]);
+  }
+
+  return daysOfWeek;
+}
+
+// Function to update the chart based on the selected date range
+async function updateChart() {
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+
+  // Validate the selected dates
+  if (startDate === '' || endDate === '') {
+    alert('Please select both start and end dates.');
+    return;
+  }
+
+  // Fetch data for the selected date range from your PHP files
+  try {
+    const offersResponse = await fetch(`completeoffers.php?start_date=${startDate}&end_date=${endDate}`);
+    const requestsResponse = await fetch(`completerequests.php?start_date=${startDate}&end_date=${endDate}`);
+    const pendingOffersResponse = await fetch(`pendingoffers.php?start_date=${startDate}&end_date=${endDate}`);
+    const pendingRequestsResponse = await fetch(`pendingrequests.php?start_date=${startDate}&end_date=${endDate}`);
+    
+    const offersData = await offersResponse.json();
+    const requestsData = await requestsResponse.json();
+    const pendingOffersData = await pendingOffersResponse.json();
+    const pendingRequestsData = await pendingRequestsResponse.json();
+
+    // Get the selected date range
+    const selectedDateRange = getDaysOfWeek(startDate, endDate);
+
+    // Process data for offers
+    const offersCounts = Array.from({ length: selectedDateRange.length }, (_, index) => {
+      const date = selectedDateRange[index];
+      const offersCount = offersData.find(item => item.submission_dates.includes(date))?.location_count || 0;
+      return offersCount;
+    });
+
+    // Process data for requests
+    const requestsCounts = Array.from({ length: selectedDateRange.length }, (_, index) => {
+      const date = selectedDateRange[index];
+      const requestsCount = requestsData.find(item => item.submission_dates.includes(date))?.location_count || 0;
+      return requestsCount;
+    });
+
+    // Process data for pending offers
+    const pendingOffersCounts = Array.from({ length: selectedDateRange.length }, (_, index) => {
+      const date = selectedDateRange[index];
+      const pendingOffersCount = pendingOffersData.find(item => item.submission_dates.includes(date))?.location_count || 0;
+      return pendingOffersCount;
+    });
+
+    // Process data for pending requests
+    const pendingRequestsCounts = Array.from({ length: selectedDateRange.length }, (_, index) => {
+      const date = selectedDateRange[index];
+      const pendingRequestsCount = pendingRequestsData.find(item => item.submission_dates.includes(date))?.location_count || 0;
+      return pendingRequestsCount;
+    });
+
+    // Update the chart data and redraw
+    updateChartWithData(selectedDateRange, offersCounts, requestsCounts, pendingOffersCounts, pendingRequestsCounts);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    alert('Error fetching data. Please try again.');
+  }
+}
+
+// Function to update the chart with specific data
+function updateChartWithData(labels, offersData, requestsData, pendingOffersData, pendingRequestsData) {
+  // Create or update the chart
+  if (!myChart) {
+    const ctx = document.getElementById('myChart').getContext('2d');
+    myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Complete Offers',
+            backgroundColor: 'rgba(128, 0, 128, 0.2)', // Purple color
+            borderColor: 'rgba(128, 0, 128, 1)',
+            borderWidth: 1,
+            data: offersData
+          },
+          {
+            label: 'Complete Requests',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1,
+            data: requestsData
+          },
+          {
+            label: 'Pending Offers',
+            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+            borderColor: 'rgba(255, 206, 86, 1)',
+            borderWidth: 1,
+            data: pendingOffersData
+          },
+          {
+            label: 'Pending Requests',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1,
+            data: pendingRequestsData
+          }
+        ]
+      },
+      options: {
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'day',
+              tooltipFormat: 'DD-MM-YYYY',
+              displayFormats: {
+                day: 'DD-MM-YYYY'
+              }
+            }
+          },
+          y: {
+            beginAtZero: true
+          }
+        },
+        legend: {
+          display: true,
+          position: 'top'
+        }
+      }
+    });
+  } else {
+    myChart.data.labels = labels;
+    myChart.data.datasets[0].data = offersData;
+    myChart.data.datasets[1].data = requestsData;
+    myChart.data.datasets[2].data = pendingOffersData;
+    myChart.data.datasets[3].data = pendingRequestsData;
+    myChart.update();
+  }
+}
+
+// Function to get an array of date strings for the selected date range
+function getDaysOfWeek(startDate, endDate) {
+  const daysInRange = [];
+  const currentDay = new Date(startDate);
+  while (currentDay <= new Date(endDate)) {
+    daysInRange.push(currentDay.toISOString().split('T')[0]);
+    currentDay.setDate(currentDay.getDate() + 1);
+  }
+  return daysInRange;
+}
+
+let myChart; // Declare myChart outside the script block
+</script>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="login.css">
+    <title>Login Page</title>
+</head>
+<body>
+    
+   <!--Adding a header-->
+   <nav>
+    <div class="logo">
+       <p>Des Times</p>
+    </div>
+    <ul>
+       <!--li><a href="#">Sign In</a></li-->
+       <li><a href="index.html">Register Now</a></li>
+       <li><a href="ABOUT.html">About</a></li> 
+       <li><a href="CONTACT.html">Contact</a></li>
+    </ul>
+ </nav>
+
+ <!--Adding animated text-->
+
+    <div id="container">
+      <span id="text1"></span>
+      <span id="text2"></span>
+    </div>
+
+    <svg id="filters">
+       <defs>
+         <filter id="threshold">
+           <feColorMatrix in="SourceGraphic" type="matrix"
+           values="1 0 0 0 0
+                    0 1 0 0 0
+                    0 0 1 0 0
+                    0 0 0 255 -140" />
+       </filter>
+    </defs>
+    </svg>
+
+    <div class ="box">
+        
+
+      <form autocomplete="off" action="login.php" method="post" id="loginForm">
+            <h2>Sign In</h2>
+            <div class="inputBox">
+
+            <input type="hidden" id="hiddenUsername" name="hiddenUsername">
+
+				<input type="text" required="required" id="username" name="username">
+				<span>Username</span>
+				<i></i>
+			</div>
+            <div class="inputBox">
+				<input type="password" required="required" id="password" name="password">
+                <span>Password</span>
+                <i></i>
+			</div>
+         
+            <input type="submit" value="Login">
+        </form>
+    </div>
+
+    <script>
+      document.getElementById("loginForm").addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent the form from submitting directly
+    
+        // Get the username input value
+        var username = document.getElementById("username").value;
+    
+        // Set the value of the hidden input field
+        document.getElementById("hiddenUsername").value = username;
+    
+        // Submit the form
+        this.submit();
+      });
+    </script>
+    
+
+</body>
+
+<script src="text_effect_for_index.js"></script>
+
+</html>
